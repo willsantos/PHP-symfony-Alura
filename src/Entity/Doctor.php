@@ -22,5 +22,23 @@ class Doctor
      */
     public $name;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Specialty::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $specialty;
+
+    public function getSpecialty(): ?Specialty
+    {
+        return $this->specialty;
+    }
+
+    public function setSpecialty(?Specialty $specialty): self
+    {
+        $this->specialty = $specialty;
+
+        return $this;
+    }
+
 
 }
