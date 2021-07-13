@@ -64,8 +64,9 @@ class DoctorController extends AbstractController
             return new Response('',Response::HTTP_NOT_FOUND);
         }
 
-        $doctor->crm = $doctorUpdate->crm;
-        $doctor->name = $doctorUpdate->name;
+        $doctor
+            ->setCrm($doctorUpdate->getCrm)
+            ->setName($doctorUpdate->getName);
 
 
         $this->entityManager->flush();
