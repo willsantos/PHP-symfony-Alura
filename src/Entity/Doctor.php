@@ -1,9 +1,11 @@
 <?php
 namespace App\Entity;
 
+use App\Repository\DoctorRepository;
 use Doctrine\ORM\Mapping as ORM;
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass=DoctorRepository::class)
+ *
  */
 class Doctor implements \JsonSerializable
 {
@@ -27,6 +29,8 @@ class Doctor implements \JsonSerializable
      * @ORM\JoinColumn(nullable=false)
      */
     private $specialty;
+
+    private $teste; 
 
     public function getSpecialty(): ?Specialty
     {
@@ -63,8 +67,9 @@ class Doctor implements \JsonSerializable
     /**
      * Set the value of crm
      *
+     * @param int $crm
      * @return  self
-     */ 
+     */
     public function setCrm(int $crm): self
     {
         $this->crm = $crm;
@@ -83,8 +88,9 @@ class Doctor implements \JsonSerializable
     /**
      * Set the value of name
      *
+     * @param string $name
      * @return  self
-     */ 
+     */
     public function setName(string $name) :self
     {
         $this->name = $name;

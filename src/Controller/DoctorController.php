@@ -3,14 +3,14 @@ namespace App\Controller;
 
 
 
-use App\Entity\Doctor;
 use App\Helper\DoctorFactory;
+use App\Repository\DoctorRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class DoctorController extends AbstractController
 {
@@ -22,14 +22,20 @@ class DoctorController extends AbstractController
      * @var DoctorFactory
      */
     private $doctorFactory;
+    /**
+     * @var DoctorRepository
+     */
+    private $repository;
 
     public function __construct(
         EntityManagerInterface $entityManager, 
-        DoctorFactory $doctorFactory
+        DoctorFactory $doctorFactory,
+        DoctorRepository $repository
     )
     {
        $this->entityManager = $entityManager;
        $this->doctorFactory = $doctorFactory;
+        $this->repository = $repository;
     }
     /**
      * @Route("/medicos", methods={"POST"})
@@ -98,11 +104,7 @@ class DoctorController extends AbstractController
 
     public function findAll():Response
     {
-        $doctorRepository = $this
-            ->getDoctrine()
-            ->getRepository(Doctor::class);
-
-        $doctorList = $doctorRepository->findAll();
+        $doctorList = $this->repository->findAll();
         return new JsonResponse($doctorList);
     }
 
@@ -125,13 +127,22 @@ class DoctorController extends AbstractController
 
     public function findDoctor(int $id)
     {
-        $doctorRepository = $this
-            ->getDoctrine()
-            ->getRepository(Doctor::class);
-        $doctor = $doctorRepository->find($id);
 
+        $doctor = $this->repository->find($id);
 
         return $doctor;
 
+    }
+
+    /**
+     * @Route("/especialidades/{idSpecialty}/medicos",methods={"GET"})
+     */
+    public function findBySpecialty(int $idSpecialty): Response
+    {
+        $doctor = $this->repository->findBy([
+            "specialty"=>$idSpecialty
+        ]);
+
+        return new JsonResponse($doctor);
     }
 }
