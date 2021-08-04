@@ -3,100 +3,34 @@
 namespace App\Controller;
 
 use App\Entity\Specialty;
+use App\Helper\RequestExtractor;
+use App\Helper\SpecialtyFactory;
 use App\Repository\SpecialtyRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 
-class SpecialtiesController extends AbstractController 
+class SpecialtiesController extends BaseController
 {
-    /** 
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-    /**
-     * @var SpecialtyRepository 
-     */
-    private $specialtyRepository;
+
 
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        SpecialtyRepository $specialtyRepository
+        SpecialtyRepository $repository,
+        SpecialtyFactory $factory,
+        RequestExtractor $extractor
     )
     {
-        $this->entityManager = $entityManager;
-        $this->specialtyRepository = $specialtyRepository;
-    }
-
-    
-
-
-    /**
-     * @Route("/especialidades", methods={"POST"})
-     */
-    public function create(Request $request): Response
-    {
-        $body = $request->getContent();
-        $bodyJson = json_decode($body);
-
-        $specialty = new Specialty();
-        $specialty->setDescription($bodyJson->description);
-
-        $this->entityManager->persist($specialty);
-        $this->entityManager->flush();
-
-        return new JsonResponse($specialty);
+        parent::__construct($repository,$entityManager,$factory,$extractor);
     }
 
     /**
-     * @Route("/especialidade/{id}",methods={"PUT"})
+     * @param Specialty $entityUpdate
+     * @param Specialty $entity
      */
-    public function update(int $id, Request $request): Response
+    public function updateEntity($entityUpdate, $entity)
     {
-        $body = $request->getContent();
-        $bodyJson = json_decode($body);
-
-        $specialty = $this->specialtyRepository->find($id);
-        $specialty->setDescription($bodyJson->description);
-
-        $this->entityManager->flush();
-
-        return new JsonResponse($specialty);
+        $entity->setDescription($entityUpdate->getDescription());
     }
 
-    /**
-     * @Route("/especialidade/{id}",methods={"DELETE"})
-     */
-    public function remove(int $id):Response
-    {
-        $specialty = $this->specialtyRepository->find($id);
-        $this->entityManager->remove($specialty);
-        $this->entityManager->flush();
 
-        return new Response('',Response::HTTP_NO_CONTENT);
-    }
-
-    /**
-     *
-     * @Route("/especialidades",methods={"GET"})
-     */
-    public function findAll(): Response
-    {
-        $specialtyList = $this->specialtyRepository->findAll();
-
-        return new JsonResponse($specialtyList);
-    }
-
-    /**
-     *@Route("/especialidades/{id}",methods={"GET"})
-     */
-    public function findByOne(int $id): Response
-    {
-        return new JsonResponse($this->specialtyRepository->find($id));
-    }
-    
 }

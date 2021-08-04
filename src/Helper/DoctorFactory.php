@@ -4,7 +4,7 @@ namespace App\Helper;
 use App\Entity\Doctor;
 use App\Repository\SpecialtyRepository;
 
-class DoctorFactory
+class DoctorFactory implements EntityFactoryInterface
 {
     /**
      * @var specialtyRepository
@@ -16,7 +16,7 @@ class DoctorFactory
         $this->specialtyRepository = $specialtyRepository;
     }
 
-    public function makeDoctor(string $json):Doctor
+    public function makeEntity(string $json):Doctor
     {
         $bodyJson = json_decode($json);
 
