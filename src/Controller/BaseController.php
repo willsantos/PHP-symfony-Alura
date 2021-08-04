@@ -49,7 +49,16 @@ abstract class BaseController extends AbstractController
     {
         $order = $this->extractor->dataOrder($request);
         $filter = $this->extractor->dataFilter($request);
-        $entityList = $this->repository->findBy($filter,$order);
+        [$page, $items] = $this->extractor->dataPage($request);
+
+        $entityList = $this->repository->findBy(
+           $filter,
+           $order,
+           $items,
+            ($page - 1) * $items
+        );
+
+
         return new JsonResponse($entityList);
     }
 

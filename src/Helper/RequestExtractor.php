@@ -8,11 +8,17 @@ class RequestExtractor
 {
     private function requestData(Request $request)
     {
-        $order = $request->query->get('sort');
-        $filter = $request->query->all();
-        unset($filter['sort']);
+        $query = $request->query->all();
+        $order = array_key_exists('sort',$query) ? $query['sort'] : [];
+        unset($query['sort']);
 
-        return [$order,$filter];
+        $page = array_key_exists('page',$query) ? $query['page'] : 1;
+        unset($query['page']);
+
+        $items = array_key_exists('items',$query) ? $query['items'] : 5;
+        unset($query['items']);
+
+        return [$order,$query, $page,$items];
     }
 
     public function dataOrder(Request $request)
@@ -27,5 +33,12 @@ class RequestExtractor
         [,$filter] = $this->requestData($request);
 
         return $filter;
+    }
+
+    public function dataPage(Request $request)
+    {
+        [,,$page,$items] = $this->requestData($request);
+
+        return [$page,$items];
     }
 }
