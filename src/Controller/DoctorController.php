@@ -54,10 +54,14 @@ class DoctorController extends BaseController
 
     /**
      * @param Doctor $entityUpdate
-     * @param Doctor $entity
      */
-    function updateEntity($entityUpdate, $entity)
+    function updateEntity($entityUpdate, $id)
     {
+        $entity = $this->repository->find($id);
+        if(is_null($entity)){
+            throw new \InvalidArgumentException();
+        }
+
         $entity
             ->setCrm($entityUpdate->getCrm())
             ->setName($entityUpdate->getName())

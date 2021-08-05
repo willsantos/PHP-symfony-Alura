@@ -25,10 +25,14 @@ class SpecialtiesController extends BaseController
 
     /**
      * @param Specialty $entityUpdate
-     * @param Specialty $entity
      */
-    public function updateEntity($entityUpdate, $entity)
+    public function updateEntity($entityUpdate, $id)
     {
+        $entity = $this->repository->find($id);
+        if(is_null($entity)){
+            throw new \InvalidArgumentException();
+        }
+
         $entity->setDescription($entityUpdate->getDescription());
     }
 

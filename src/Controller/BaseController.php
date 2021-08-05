@@ -109,8 +109,8 @@ abstract class BaseController extends AbstractController
         $entityUpdate = $this->factory->makeEntity($body);
 
         try {
-           $entity = $this->repository->find($id);
-           $this->updateEntity($entityUpdate,$entity);
+           //$entity = $this->repository->find($id);
+           $this->updateEntity($entityUpdate,$id);
            $this->entityManager->flush();
            $response = new ResponseFactory(true,$entityUpdate, Response::HTTP_OK);
            return $response->getResponse();
