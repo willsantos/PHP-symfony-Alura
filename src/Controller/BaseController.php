@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Helper\EntityFactoryInterface;
 use App\Helper\RequestExtractor;
+use App\Helper\ResponseFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -58,13 +59,27 @@ abstract class BaseController extends AbstractController
             ($page - 1) * $items
         );
 
+        $response = new ResponseFactory(
+            true,
+            $entityList,
+            Response::HTTP_OK,
+            $page,
+            $items
+        );
 
-        return new JsonResponse($entityList);
+        return $response->getResponse();
     }
 
     public function show(int $id): Response
     {
-        return new JsonResponse($this->repository->find($id));
+        $entity = $this->repository->find($id);
+        $status = is_null($entity) ? Response::HTTP_NO_CONTENT : Response::HTTP_OK;
+        $response = new ResponseFactory(
+            true,
+            $entity,
+            $status
+        );
+        return $response->getResponse();
     }
 
     public function remove(int $id):Response
@@ -93,15 +108,28 @@ abstract class BaseController extends AbstractController
 
         $entityUpdate = $this->factory->makeEntity($body);
 
-        $entity = $this->repository->find($id);
-
-        if(is_null($entity)){
-            return new Response('',Response::HTTP_NOT_FOUND);
+        try {
+           $entity = $this->repository->find($id);
+           $this->updateEntity($entityUpdate,$entity);
+           $this->entityManager->flush();
+           $response = new ResponseFactory(true,$entityUpdate, Response::HTTP_OK);
+           return $response->getResponse();
+        }catch (\InvalidArgumentException $exception){
+            $response = new ResponseFactory(
+                false,
+                'Not Found',
+                Response::HTTP_NOT_FOUND
+            );
+            return $response->getResponse();
         }
 
-        $this->updateEntity($entityUpdate,$entity);
 
-        $this->entityManager->flush();
+
+        /*if(is_null($entity)){
+            return new Response('',Response::HTTP_NOT_FOUND);
+        }*/
+
+
 
         return new JsonResponse($entity);
     }

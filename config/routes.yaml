@@ -7,12 +7,12 @@ doctors:
   methods:
     - GET
 doctor:
-  path: /medico/{id}
+  path: /medicos/{id}
   controller: App\Controller\DoctorController::show
   methods:
     - GET
 doctor_remove:
-  path: /medico/{id}
+  path: /medicos/{id}
   controller: App\Controller\DoctorController::remove
   methods:
     - DELETE
@@ -22,7 +22,7 @@ doctor_create:
   methods:
     - POST
 doctor_update:
-  path: /medico/{id}
+  path: /medicos/{id}
   controller: App\Controller\DoctorController::update
   methods:
     - PUT
@@ -32,12 +32,12 @@ specialties:
   methods:
     - GET
 specialty:
-  path: /especialidade/{id}
+  path: /especialidades/{id}
   controller: App\Controller\SpecialtiesController::show
   methods:
     - GET
 specialty_remove:
-  path: /especialidade/{id}
+  path: /especialidades/{id}
   controller: App\Controller\SpecialtiesController::remove
   methods:
     - DELETE
@@ -47,7 +47,7 @@ specialty_create:
   methods:
     - POST
 specialty_update:
-  path: /especialidade/{id}
+  path: /especialidades/{id}
   controller: App\Controller\SpecialtiesController::update
   methods:
     - PUT

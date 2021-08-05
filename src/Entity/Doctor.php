@@ -104,7 +104,17 @@ class Doctor implements \JsonSerializable
             'id' => $this->getId(),
             'crm' => $this->getCrm(),
             'name' => $this->getName(),
-            'specialty' => $this->getSpecialty()->getDescription()
+            'specialty' => $this->getSpecialty()->getDescription(),
+            '_links'=>[
+                [
+                    'rel'=>'self',
+                    'path'=>'/medicos/' .$this->getId()
+                ],
+                [
+                    'rel'=>'especilidade',
+                    'path'=>'/especialidades/' . $this->getId()
+                ]
+            ]
         ];    
     }
 }
