@@ -19,6 +19,9 @@ class ResponseFactory
      * @var int
      */
     private $items;
+    /**
+     * @var mixed
+     */
     private $responseContent;
     /**
      * @var int
@@ -26,11 +29,11 @@ class ResponseFactory
     private $status;
 
     public function __construct(
+        $responseContent,
         bool $success,
-             $responseContent,
         $status = Response::HTTP_OK,
-        int  $page = null,
-        int  $items = null
+        ?int  $page = null,
+        ?int  $items = null
     )
     {
         $this->success = $success;
@@ -38,6 +41,11 @@ class ResponseFactory
         $this->items = $items;
         $this->responseContent = $responseContent;
         $this->status = $status;
+    }
+
+    public static function fromError(\Throwable $erro)
+    {
+        return new self(['mensagem' => $erro->getMessage()], false, Response::HTTP_INTERNAL_SERVER_ERROR, null,null);
     }
 
     public function getResponse(): JsonResponse
