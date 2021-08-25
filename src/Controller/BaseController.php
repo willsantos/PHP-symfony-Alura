@@ -9,6 +9,8 @@ use App\Helper\RequestExtractor;
 use App\Helper\ResponseFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,18 +34,24 @@ abstract class BaseController extends AbstractController
      * @var RequestExtractor
      */
     private $extractor;
+    /**
+     * @var CacheItemInterface
+     */
+    private $cacheItem;
 
     public function __construct(
         ObjectRepository $repository,
         EntityManagerInterface $entityManager,
         EntityFactoryInterface $factory,
-        RequestExtractor $extractor
+        RequestExtractor $extractor,
+        CacheItemPoolInterface $cacheItem
     )
     {
         $this->repository = $repository;
         $this->entityManager = $entityManager;
         $this->factory = $factory;
         $this->extractor = $extractor;
+        $this->cacheItem = $cacheItem;
     }
 
     public function index(Request $request): Response
@@ -60,8 +68,8 @@ abstract class BaseController extends AbstractController
         );
 
         $response = new ResponseFactory(
-            true,
             $entityList,
+            true,
             Response::HTTP_OK,
             $page,
             $items
@@ -72,11 +80,15 @@ abstract class BaseController extends AbstractController
 
     public function show(int $id): Response
     {
-        $entity = $this->repository->find($id);
+
+        $entity = $this->cacheItem->hasItem($this->cachePrefix() . $id)
+            ? $this->cacheItem->getItem($this->cachePrefix() . $id)->get()
+            : $this->repository->find($id);
+
         $status = is_null($entity) ? Response::HTTP_NO_CONTENT : Response::HTTP_OK;
         $response = new ResponseFactory(
-            true,
             $entity,
+            true,
             $status
         );
         return $response->getResponse();
@@ -88,6 +100,9 @@ abstract class BaseController extends AbstractController
         $this->entityManager->remove($entity);
         $this->entityManager->flush();
 
+        $this->cacheItem->deleteItem($this->cachePrefix() . $id);
+
+
         return new Response('',Response::HTTP_NO_CONTENT);
     }
 
@@ -98,6 +113,10 @@ abstract class BaseController extends AbstractController
 
         $this->entityManager->persist($entity);
         $this->entityManager->flush();
+
+        $cache= $this->cacheItem->getItem($this->cachePrefix() . $entity->getId());
+        $cache->set($entity);
+        $this->cacheItem->save($cache);
 
         return new JsonResponse($entity);
     }
@@ -113,6 +132,11 @@ abstract class BaseController extends AbstractController
            $this->updateEntity($entityUpdate,$id);
            $this->entityManager->flush();
            $response = new ResponseFactory(true,$entityUpdate, Response::HTTP_OK);
+
+           $cache = $this->cacheItem->getItem($this->cachePrefix(). $id);
+           $cache->set($entityUpdate);
+           $this->cacheItem->save($cache);
+
            return $response->getResponse();
         }catch (\InvalidArgumentException $exception){
             $response = new ResponseFactory(
@@ -123,17 +147,8 @@ abstract class BaseController extends AbstractController
             return $response->getResponse();
         }
 
-
-
-        /*if(is_null($entity)){
-            return new Response('',Response::HTTP_NOT_FOUND);
-        }*/
-
-
-
-        return new JsonResponse($entity);
     }
 
     abstract function updateEntity($entityUpdate,$entity);
-
+    abstract function cachePrefix():string;
 }

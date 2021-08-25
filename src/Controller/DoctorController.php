@@ -8,6 +8,7 @@ use App\Helper\DoctorFactory;
 use App\Helper\RequestExtractor;
 use App\Repository\DoctorRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -19,10 +20,11 @@ class DoctorController extends BaseController
         EntityManagerInterface $entityManager, 
         DoctorFactory $factory,
         DoctorRepository $repository,
-        RequestExtractor $extractor
+        RequestExtractor $extractor,
+        CacheItemPoolInterface $cacheItem
     )
     {
-       parent::__construct($repository,$entityManager,$factory,$extractor);
+       parent::__construct($repository,$entityManager,$factory,$extractor,$cacheItem);
 
     }
 
@@ -66,5 +68,10 @@ class DoctorController extends BaseController
             ->setCrm($entityUpdate->getCrm())
             ->setName($entityUpdate->getName())
             ->setSpecialty($entityUpdate->getSpecialty());
+    }
+
+    function cachePrefix(): string
+    {
+        return '_doctor';
     }
 }

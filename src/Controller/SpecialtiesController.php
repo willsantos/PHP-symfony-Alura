@@ -7,20 +7,20 @@ use App\Helper\RequestExtractor;
 use App\Helper\SpecialtyFactory;
 use App\Repository\SpecialtyRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 class SpecialtiesController extends BaseController
 {
-
-
 
     public function __construct(
         EntityManagerInterface $entityManager,
         SpecialtyRepository $repository,
         SpecialtyFactory $factory,
-        RequestExtractor $extractor
+        RequestExtractor $extractor,
+        CacheItemPoolInterface $cacheItem
     )
     {
-        parent::__construct($repository,$entityManager,$factory,$extractor);
+        parent::__construct($repository,$entityManager,$factory,$extractor,$cacheItem);
     }
 
     /**
@@ -37,4 +37,8 @@ class SpecialtiesController extends BaseController
     }
 
 
+    function cachePrefix(): string
+    {
+        return 'specialty_';
+    }
 }
