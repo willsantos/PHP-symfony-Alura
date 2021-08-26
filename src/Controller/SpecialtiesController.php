@@ -8,6 +8,7 @@ use App\Helper\SpecialtyFactory;
 use App\Repository\SpecialtyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 
 class SpecialtiesController extends BaseController
 {
@@ -17,10 +18,11 @@ class SpecialtiesController extends BaseController
         SpecialtyRepository $repository,
         SpecialtyFactory $factory,
         RequestExtractor $extractor,
-        CacheItemPoolInterface $cacheItem
+        CacheItemPoolInterface $cacheItem,
+        LoggerInterface $logger
     )
     {
-        parent::__construct($repository,$entityManager,$factory,$extractor,$cacheItem);
+        parent::__construct($repository,$entityManager,$factory,$extractor,$cacheItem,$logger);
     }
 
     /**

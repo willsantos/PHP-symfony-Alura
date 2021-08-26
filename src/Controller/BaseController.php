@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,13 +39,19 @@ abstract class BaseController extends AbstractController
      * @var CacheItemInterface
      */
     private $cacheItem;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     public function __construct(
         ObjectRepository $repository,
         EntityManagerInterface $entityManager,
         EntityFactoryInterface $factory,
         RequestExtractor $extractor,
-        CacheItemPoolInterface $cacheItem
+        CacheItemPoolInterface $cacheItem,
+        LoggerInterface $logger
+
     )
     {
         $this->repository = $repository;
@@ -52,6 +59,7 @@ abstract class BaseController extends AbstractController
         $this->factory = $factory;
         $this->extractor = $extractor;
         $this->cacheItem = $cacheItem;
+        $this->logger = $logger;
     }
 
     public function index(Request $request): Response
@@ -117,6 +125,10 @@ abstract class BaseController extends AbstractController
         $cache= $this->cacheItem->getItem($this->cachePrefix() . $entity->getId());
         $cache->set($entity);
         $this->cacheItem->save($cache);
+        $this->logger->notice('New record {entity} added with id: {id}',[
+            'entity'=> get_class($entity),
+            'id'=>$entity->getId(),
+        ]);
 
         return new JsonResponse($entity);
     }
