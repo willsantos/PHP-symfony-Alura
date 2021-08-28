@@ -9,6 +9,8 @@ use App\Repository\SpecialtyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 class SpecialtiesController extends BaseController
 {
@@ -42,5 +44,16 @@ class SpecialtiesController extends BaseController
     function cachePrefix(): string
     {
         return 'specialty_';
+    }
+
+
+    /**
+     * @Route("/especialidades_html")
+     */
+    public function SpecialtyHtml(): Response
+    {
+        $specialties = $this->repository->findAll();
+
+        return $this->render('specialties.html.twig',['specialties'=>$specialties]);
     }
 }

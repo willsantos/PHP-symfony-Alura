@@ -21,6 +21,7 @@
         "symfony/maker-bundle": "^1.33",
         "symfony/proxy-manager-bridge": "4.4.*",
         "symfony/security-bundle": "4.4.*",
+        "symfony/twig-pack": "^1.0",
         "symfony/yaml": "4.4.*"
     },
     "config": {

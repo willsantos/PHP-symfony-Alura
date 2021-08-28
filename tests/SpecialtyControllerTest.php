@@ -61,4 +61,12 @@ class SpecialtyControllerTest extends WebTestCase
 
         return json_decode($browser->getResponse()->getContent())->access_token;
     }
+
+    public function testHtmlSpecialties()
+    {
+        $client = self::createClient();
+        $client->request('GET','/especialidades_html');
+        $this->assertSelectorTextContains('h1','Especialidades');
+        $this->assertSelectorExists('.especialidade');
+    }
 }
